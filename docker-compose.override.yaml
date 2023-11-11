@@ -1,0 +1,39 @@
+version: '3.4'
+
+x-build:
+  - &build-args
+    APP_ENV: 'dev'
+    APP_DEBUG: '1'
+  - &build-cache
+    - ${IMAGE:-vuongxuongminh/docker-helm-symfony}:dev
+
+services:
+  setup:
+    image: ${IMAGE:-vuongxuongminh/docker-helm-symfony}:dev
+    command: ['setup']
+    build:
+      context: .
+      dockerfile: ./docker/fpm/Dockerfile
+      cache_from: *build-cache
+      args:
+        << : *build-args
+    environment:
+      << : *build-args
+    volumes:
+      - ./symfony:/symfony
+
+  fpm:
+    image: ${IMAGE:-vuongxuongminh/docker-helm-symfony}:dev
+    build:
+      cache_from: *build-cache
+      args:
+        << : *build-args
+    environment:
+      << : *build-args
+    volumes:
+      - ./symfony:/symfony
+
+  nginx:
+    volumes:
+      - ./symfony/public:/symfony/public
+      - ./docker/nginx/default.conf:/opt/bitnami/nginx/conf/server_blocks/default.conf:ro
