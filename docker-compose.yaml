@@ -6,6 +6,7 @@ services:
     build:
       context: .
       dockerfile: ./docker/fpm/Dockerfile
+      PHP_VERSION: '8.2'
     healthcheck:
       test: ['CMD', 'docker-healthcheck', 'fpm']
       interval: 10s
